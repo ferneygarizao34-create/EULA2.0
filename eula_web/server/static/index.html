@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Eula</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#05070c;
+    --bg-1:#0b1120;
+    --bg-2:#111a2d;
+    --vidrio:rgba(18,26,42,0.55);
+    --borde-vidrio:rgba(140,200,255,0.14);
+    --texto:#e9eef6;
+    --texto-tenue:#8391a8;
+    --texto-mudo:#4d5a70;
+    --nucleo-idle:#46e8d0;
+    --nucleo-escucha:#ff4fa3;
+    --nucleo-hablar:#8af0ff;
+    --nucleo-pensar:#46e8d0;
+    --alerta:#ffb454;
+    --fuente-display:'Space Grotesk', sans-serif;
+    --fuente-cuerpo:'Inter', sans-serif;
+    --fuente-mono:'JetBrains Mono', monospace;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; }
+  body{
+    margin:0;
+    font-family:var(--fuente-cuerpo);
+    color:var(--texto);
+    background:var(--bg-0);
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  /* --- Fondo ambiental --- */
+  .fondo{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(70,232,208,0.10), transparent 40%),
+      radial-gradient(circle at 85% 78%, rgba(255,79,163,0.08), transparent 45%),
+      linear-gradient(180deg, var(--bg-0) 0%, var(--bg-1) 60%, var(--bg-0) 100%);
+  }
+  .fondo::after{
+    content:"";
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(rgba(140,200,255,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(140,200,255,0.035) 1px, transparent 1px);
+    background-size:42px 42px;
+    mask-image:radial-gradient(circle at 50% 30%, black, transparent 75%);
+  }
+
+  /* --- Barra superior --- */
+  .barra-superior{
+    position:relative; z-index:2;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 22px;
+    gap:12px;
+    flex-shrink:0;
+  }
+  .marca{ display:flex; align-items:center; gap:10px; }
+  .marca .nombre{
+    font-family:var(--fuente-display); font-weight:700; font-size:19px;
+    letter-spacing:0.06em;
+    background:linear-gradient(90deg, #d9fffa, var(--nucleo-idle));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .barra-superior-derecha{ display:flex; align-items:center; gap:10px; }
+  .pastilla-estado{
+    font-family:var(--fuente-mono); font-size:11px; letter-spacing:0.03em;
+    color:var(--texto-tenue);
+    padding:6px 12px; border-radius:20px;
+    background:var(--vidrio); border:1px solid var(--borde-vidrio);
+    display:flex; align-items:center; gap:7px;
+    white-space:nowrap;
+  }
+  .punto{
+    width:7px; height:7px; border-radius:50%;
+    background:var(--texto-mudo);
+    box-shadow:0 0 0 rgba(0,0,0,0);
+    transition:background .3s, box-shadow .3s;
+  }
+  .pastilla-estado.en-linea .punto{ background:var(--nucleo-idle); box-shadow:0 0 8px var(--nucleo-idle); }
+  .pastilla-estado.error .punto{ background:var(--alerta); box-shadow:0 0 8px var(--alerta); }
+
+  .boton-fantasma{
+    font-family:var(--fuente-mono); font-size:11px; letter-spacing:0.03em;
+    color:var(--texto-tenue); background:transparent;
+    border:1px solid var(--borde-vidrio); border-radius:20px;
+    padding:6px 13px; cursor:pointer;
+    transition:color .2s, border-color .2s, background .2s;
+  }
+  .boton-fantasma:hover{ color:var(--texto); border-color:rgba(140,200,255,0.35); background:var(--vidrio); }
+
+  /* --- La esfera (elemento firma) --- */
+  .esfera{ position:relative; }
+  .esfera .capa{
+    position:absolute; inset:0; border-radius:50%;
+    border:1.4px solid color-mix(in srgb, var(--color-nucleo, var(--nucleo-idle)) 65%, transparent);
+  }
+  .esfera .capa-1{ border-radius:42% 58% 63% 37% / 41% 44% 56% 59%; animation:girar 13s linear infinite; }
+  .esfera .capa-2{ border-radius:63% 37% 41% 59% / 55% 46% 54% 45%; opacity:.55; animation:girar 9s linear infinite reverse; }
+  .esfera .anillo{
+    position:absolute; inset:-14%; border-radius:50%;
+    border:1px solid color-mix(in srgb, var(--color-nucleo, var(--nucleo-idle)) 40%, transparent);
+    animation:pulso-anillo 3.2s ease-in-out infinite;
+  }
+  .esfera .nucleo{
+    position:absolute; inset:28%; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #f4fffd, var(--color-nucleo, var(--nucleo-idle)) 55%, transparent 78%);
+    filter:blur(0.5px);
+    animation:respirar 4.2s ease-in-out infinite;
+    box-shadow:0 0 30px color-mix(in srgb, var(--color-nucleo, var(--nucleo-idle)) 55%, transparent);
+  }
+
+  .esfera-grande{ width:150px; height:150px; --color-nucleo:var(--nucleo-idle); }
+  .esfera-mini{ width:30px; height:30px; --color-nucleo:var(--nucleo-idle); flex-shrink:0; }
+  .esfera-mini .anillo{ display:none; }
+
+  @keyframes girar{ to{ transform:rotate(360deg); } }
+  @keyframes respirar{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.1); } }
+  @keyframes pulso-anillo{ 0%,100%{ transform:scale(1); opacity:.45; } 50%{ transform:scale(1.22); opacity:.08; } }
+  @keyframes hablar-pulso{ 0%,100%{ transform:scale(1); } 25%{ transform:scale(1.14); } 50%{ transform:scale(0.96); } 75%{ transform:scale(1.08); } }
+
+  /* Estados de la esfera controlados desde <body data-estado="..."> */
+  body[data-estado="idle"] .esfera{ --color-nucleo:var(--nucleo-idle); }
+
+  body[data-estado="escuchando"] .esfera{ --color-nucleo:var(--nucleo-escucha); }
+  body[data-estado="escuchando"] .esfera .nucleo{ animation-duration:1.1s; }
+  body[data-estado="escuchando"] .esfera .anillo{ animation-duration:1.1s; }
+
+  body[data-estado="pensando"] .esfera{ --color-nucleo:var(--nucleo-pensar); }
+  body[data-estado="pensando"] .esfera .capa-1{ animation-duration:2.4s; }
+  body[data-estado="pensando"] .esfera .capa-2{ animation-duration:1.7s; }
+  body[data-estado="pensando"] .esfera .nucleo{ animation-duration:1.6s; }
+
+  body[data-estado="hablando"] .esfera{ --color-nucleo:var(--nucleo-hablar); }
+  body[data-estado="hablando"] .esfera .nucleo{ animation:hablar-pulso .55s ease-in-out infinite; }
+
+  @media (prefers-reduced-motion: reduce){
+    .esfera *{ animation:none !important; }
+  }
+
+  /* --- Escenario central --- */
+  .escenario{
+    position:relative; z-index:1;
+    flex:1; min-height:0;
+    display:flex; flex-direction:column; align-items:center;
+    width:100%;
+  }
+
+  .bienvenida{
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:22px; padding:0 20px; text-align:center;
+    transition:opacity .35s ease, transform .35s ease;
+  }
+  .bienvenida h1{
+    font-family:var(--fuente-display); font-weight:600; font-size:26px; margin:0;
+    color:var(--texto);
+  }
+  .bienvenida p{
+    font-family:var(--fuente-mono); font-size:12.5px; color:var(--texto-tenue);
+    margin:0; max-width:420px; line-height:1.6; letter-spacing:0.01em;
+  }
+  body.conversacion-activa .bienvenida{
+    display:none;
+  }
+
+  .chat{
+    display:none;
+    flex-direction:column;
+    width:100%; max-width:720px;
+    flex:1; min-height:0; overflow-y:auto;
+    padding:18px 20px 12px;
+    gap:14px;
+    scroll-behavior:smooth;
+  }
+  body.conversacion-activa .chat{ display:flex; }
+
+  .fila{ display:flex; gap:10px; max-width:100%; }
+  .fila.usuario{ justify-content:flex-end; }
+  .fila.eula{ justify-content:flex-start; align-items:flex-start; }
+
+  .avatar-mensaje{
+    width:26px; height:26px; border-radius:50%; flex-shrink:0; margin-top:4px;
+  }
+
+  .burbuja{
+    padding:12px 15px; border-radius:16px; line-height:1.5; font-size:14.5px;
+    max-width:min(78%, 540px); white-space:pre-wrap; word-wrap:break-word;
+  }
+  .fila.usuario .burbuja{
+    background:linear-gradient(155deg, #1c3b52, #16283f);
+    border:1px solid rgba(140,200,255,0.18);
+    border-bottom-right-radius:4px;
+  }
+  .fila.eula .burbuja{
+    background:var(--vidrio);
+    border:1px solid var(--borde-vidrio);
+    border-bottom-left-radius:4px;
+  }
+  .fila.eula .burbuja.pensando{ display:flex; gap:5px; align-items:center; padding:14px 16px; }
+  .punto-typing{
+    width:6px; height:6px; border-radius:50%; background:var(--nucleo-idle);
+    animation:tres-puntos 1.1s ease-in-out infinite;
+  }
+  .punto-typing:nth-child(2){ animation-delay:.15s; }
+  .punto-typing:nth-child(3){ animation-delay:.3s; }
+  @keyframes tres-puntos{ 0%,60%,100%{ opacity:.25; transform:translateY(0);} 30%{ opacity:1; transform:translateY(-3px);} }
+
+  .adjuntos-mensaje{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px; }
+  .miniatura-adjunto{
+    width:64px; height:64px; border-radius:10px; object-fit:cover;
+    border:1px solid var(--borde-vidrio);
+  }
+  .chip-doc-mensaje{
+    display:flex; align-items:center; gap:6px;
+    font-family:var(--fuente-mono); font-size:11px; color:var(--texto-tenue);
+    background:rgba(255,255,255,0.04); border:1px solid var(--borde-vidrio);
+    border-radius:10px; padding:6px 10px; max-width:180px;
+  }
+  .chip-doc-mensaje span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  /* --- Barra de entrada --- */
+  .barra-entrada{
+    position:relative; z-index:2;
+    width:100%; display:flex; flex-direction:column; align-items:center;
+    padding:10px 20px calc(16px + env(safe-area-inset-bottom));
+    flex-shrink:0;
+    gap:8px;
+  }
+
+  .adjuntos-pendientes{
+    width:100%; max-width:680px;
+    display:flex; flex-wrap:wrap; gap:8px;
+  }
+  .chip-adjunto{
+    display:flex; align-items:center; gap:7px;
+    background:var(--vidrio); border:1px solid var(--borde-vidrio);
+    border-radius:10px; padding:5px 6px 5px 8px;
+    font-family:var(--fuente-mono); font-size:11px; color:var(--texto-tenue);
+    max-width:180px;
+  }
+  .chip-adjunto img{ width:24px; height:24px; border-radius:5px; object-fit:cover; }
+  .chip-adjunto span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .chip-adjunto button{
+    background:none; border:none; color:var(--texto-mudo); cursor:pointer;
+    font-size:14px; line-height:1; padding:2px 4px;
+  }
+  .chip-adjunto button:hover{ color:var(--alerta); }
+
+  .caja-entrada{
+    width:100%; max-width:680px;
+    display:flex; align-items:flex-end; gap:6px;
+    background:var(--vidrio); border:1px solid var(--borde-vidrio);
+    border-radius:22px; padding:8px 8px 8px 14px;
+    backdrop-filter:blur(16px);
+    transition:border-color .2s;
+  }
+  .caja-entrada:focus-within{ border-color:rgba(140,200,255,0.4); }
+
+  .caja-entrada textarea{
+    flex:1; resize:none; border:none; outline:none; background:transparent;
+    color:var(--texto); font-family:var(--fuente-cuerpo); font-size:15px;
+    line-height:1.4; max-height:140px; padding:7px 0;
+  }
+  .caja-entrada textarea::placeholder{ color:var(--texto-mudo); }
+
+  .boton-icono{
+    width:36px; height:36px; border-radius:50%; border:none; cursor:pointer;
+    background:transparent; color:var(--texto-tenue);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    transition:background .2s, color .2s;
+  }
+  .boton-icono:hover{ background:rgba(255,255,255,0.06); color:var(--texto); }
+  .boton-icono.activo{ background:var(--nucleo-escucha); color:#1a0a12; }
+  .boton-icono svg{ width:18px; height:18px; }
+
+  .boton-enviar{
+    width:36px; height:36px; border-radius:50%; border:none; cursor:pointer; flex-shrink:0;
+    background:var(--nucleo-idle); color:#03211c;
+    display:flex; align-items:center; justify-content:center;
+    transition:transform .15s, opacity .15s;
+  }
+  .boton-enviar:hover{ transform:scale(1.06); }
+  .boton-enviar:disabled{ opacity:.35; cursor:not-allowed; transform:none; }
+  .boton-enviar svg{ width:16px; height:16px; }
+
+  .aviso{
+    font-family:var(--fuente-mono); font-size:10.5px; color:var(--texto-mudo);
+    margin:0; letter-spacing:0.02em; text-align:center;
+  }
+
+  /* Scrollbar discreto */
+  .chat::-webkit-scrollbar{ width:6px; }
+  .chat::-webkit-scrollbar-thumb{ background:rgba(140,200,255,0.15); border-radius:6px; }
+
+  @media (max-width:560px){
+    .esfera-grande{ width:120px; height:120px; }
+    .bienvenida h1{ font-size:21px; }
+    .barra-superior-derecha .boton-fantasma{ display:none; }
+  }
+</style>
+</head>
+<body data-estado="idle">
+<div class="fondo"></div>
+
+<header class="barra-superior">
+  <div class="marca">
+    <div class="esfera esfera-mini">
+      <div class="capa capa-1"></div>
+      <div class="capa capa-2"></div>
+      <div class="nucleo"></div>
+    </div>
+    <span class="nombre">EULA</span>
+  </div>
+  <div class="barra-superior-derecha">
+    <span class="pastilla-estado" id="pastillaEstado"><span class="punto"></span><span id="textoEstado">conectando…</span></span>
+    <button class="boton-fantasma" id="btnMemoria" title="Borra el historial que Eula recuerda">Borrar memoria</button>
+  </div>
+</header>
+
+<main class="escenario">
+  <section class="bienvenida" id="bienvenida">
+    <div class="esfera esfera-grande" id="esferaGrande">
+      <div class="anillo"></div>
+      <div class="capa capa-1"></div>
+      <div class="capa capa-2"></div>
+      <div class="nucleo"></div>
+    </div>
+    <h1>¿En qué puedo ayudarte?</h1>
+    <p>Escríbele o háblale a Eula. También puedes adjuntar una imagen o un documento (PDF/TXT) con el clip de abajo. Para comandos en tu PC ("abre calculadora", "qué hora es"), deja corriendo <b>agente_local.py</b>.</p>
+  </section>
+
+  <section class="chat" id="chat"></section>
+</main>
+
+<footer class="barra-entrada">
+  <div class="adjuntos-pendientes" id="adjuntosPendientes"></div>
+
+  <form class="caja-entrada" id="formEntrada">
+    <button type="button" class="boton-icono" id="btnAdjuntar" title="Adjuntar imagen o documento">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05 12.25 20.24a5.5 5.5 0 0 1-7.78-7.78l9.19-9.19a3.67 3.67 0 0 1 5.19 5.19l-9.2 9.19a1.83 1.83 0 0 1-2.59-2.59l8.49-8.48"/></svg>
+    </button>
+    <input type="file" id="inputArchivo" multiple hidden accept="image/png,image/jpeg,image/webp,application/pdf,text/plain,.doc,.docx">
+    <textarea id="entrada" rows="1" placeholder="Escríbele a Eula..."></textarea>
+    <button type="button" class="boton-icono" id="btnMic" title="Hablar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z"/><path d="M19 11a7 7 0 0 1-14 0M12 18v3"/></svg>
+    </button>
+    <button type="submit" class="boton-enviar" id="btnEnviar" title="Enviar" disabled>
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 11.5 20.5 3l-6 17.5-4-7.5-7.5-1.5Z"/></svg>
+    </button>
+  </form>
+  <p class="aviso" id="aviso">Conectando con Eula…</p>
+</footer>
+
+<script>
+// ---------- Token de acceso ----------
+const params = new URLSearchParams(location.search);
+let token = params.get("token") || localStorage.getItem("eula_token");
+if (!token) token = prompt("Token de acceso de Eula:");
+localStorage.setItem("eula_token", token);
+
+// ---------- Elementos ----------
+const body = document.body;
+const chat = document.getElementById("chat");
+const bienvenida = document.getElementById("bienvenida");
+const entrada = document.getElementById("entrada");
+const formEntrada = document.getElementById("formEntrada");
+const btnEnviar = document.getElementById("btnEnviar");
+const btnMic = document.getElementById("btnMic");
+const btnAdjuntar = document.getElementById("btnAdjuntar");
+const inputArchivo = document.getElementById("inputArchivo");
+const adjuntosPendientes = document.getElementById("adjuntosPendientes");
+const pastillaEstado = document.getElementById("pastillaEstado");
+const textoEstado = document.getElementById("textoEstado");
+const aviso = document.getElementById("aviso");
+
+const MAX_BYTES_ARCHIVO = 10 * 1024 * 1024; // 10 MB, debe coincidir con el límite del servidor
+let archivosPendientes = []; // {nombre, mime, datosBase64, previewUrl}
+
+// ---------- Estado de la esfera ----------
+function fijarEstado(nuevoEstado){ body.dataset.estado = nuevoEstado; }
+
+// ---------- WebSocket ----------
+const protocolo = location.protocol === "https:" ? "wss" : "ws";
+const ws = new WebSocket(`${protocolo}://${location.host}/ws/chat?token=${encodeURIComponent(token)}`);
+
+ws.onopen = () => {
+  pastillaEstado.classList.add("en-linea");
+  pastillaEstado.classList.remove("error");
+  textoEstado.textContent = "en línea";
+  aviso.textContent = "Eula está lista. Escribe, habla o adjunta un archivo.";
+  btnEnviar.disabled = false;
+  fijarEstado("idle");
+};
+ws.onclose = () => {
+  pastillaEstado.classList.remove("en-linea");
+  pastillaEstado.classList.add("error");
+  textoEstado.textContent = "desconectado";
+  aviso.textContent = "Se perdió la conexión. Recarga la página.";
+  btnEnviar.disabled = true;
+};
+ws.onerror = () => {
+  pastillaEstado.classList.add("error");
+  textoEstado.textContent = "error";
+  aviso.textContent = "Error de conexión (revisa el token).";
+};
+ws.onmessage = (evento) => {
+  quitarBurbujaPensando();
+  agregarMensaje(evento.data, "eula");
+  hablar(evento.data);
+};
+
+// ---------- Render de mensajes ----------
+function iniciarConversacionSiHaceFalta(){
+  if (!body.classList.contains("conversacion-activa")) {
+    body.classList.add("conversacion-activa");
+  }
+}
+
+function crearAvatarMini(){
+  const div = document.createElement("div");
+  div.className = "esfera esfera-mini avatar-mensaje";
+  div.innerHTML = '<div class="capa capa-1"></div><div class="capa capa-2"></div><div class="nucleo"></div>';
+  return div;
+}
+
+function agregarMensaje(texto, quien, adjuntos){
+  iniciarConversacionSiHaceFalta();
+  const fila = document.createElement("div");
+  fila.className = `fila ${quien}`;
+
+  if (quien === "eula") fila.appendChild(crearAvatarMini());
+
+  const burbuja = document.createElement("div");
+  burbuja.className = "burbuja";
+
+  if (adjuntos && adjuntos.length){
+    const cont = document.createElement("div");
+    cont.className = "adjuntos-mensaje";
+    adjuntos.forEach(a => {
+      if (a.mime.startsWith("image/")){
+        const img = document.createElement("img");
+        img.className = "miniatura-adjunto";
+        img.src = a.previewUrl;
+        cont.appendChild(img);
+      } else {
+        const chip = document.createElement("div");
+        chip.className = "chip-doc-mensaje";
+        chip.innerHTML = `📄 <span>${a.nombre}</span>`;
+        cont.appendChild(chip);
+      }
+    });
+    burbuja.appendChild(cont);
+  }
+
+  if (texto){
+    const p = document.createElement("div");
+    p.textContent = texto;
+    burbuja.appendChild(p);
+  }
+
+  fila.appendChild(burbuja);
+  chat.appendChild(fila);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+let filaPensando = null;
+function mostrarBurbujaPensando(){
+  iniciarConversacionSiHaceFalta();
+  filaPensando = document.createElement("div");
+  filaPensando.className = "fila eula";
+  filaPensando.appendChild(crearAvatarMini());
+  const burbuja = document.createElement("div");
+  burbuja.className = "burbuja pensando";
+  burbuja.innerHTML = '<span class="punto-typing"></span><span class="punto-typing"></span><span class="punto-typing"></span>';
+  filaPensando.appendChild(burbuja);
+  chat.appendChild(filaPensando);
+  chat.scrollTop = chat.scrollHeight;
+}
+function quitarBurbujaPensando(){
+  if (filaPensando){ filaPensando.remove(); filaPensando = null; }
+}
+
+// ---------- Voz de salida ----------
+function hablar(texto){
+  if (!("speechSynthesis" in window)) return;
+  const utter = new SpeechSynthesisUtterance(texto);
+  utter.lang = "es-CO";
+  utter.onstart = () => fijarEstado("hablando");
+  utter.onend = () => fijarEstado("idle");
+  utter.onerror = () => fijarEstado("idle");
+  speechSynthesis.speak(utter);
+}
+
+// ---------- Adjuntar archivos ----------
+btnAdjuntar.onclick = () => inputArchivo.click();
+
+inputArchivo.addEventListener("change", async () => {
+  for (const archivo of inputArchivo.files){
+    if (archivo.size > MAX_BYTES_ARCHIVO){
+      aviso.textContent = `"${archivo.name}" pesa más de 10 MB, no se adjuntó.`;
+      continue;
+    }
+    const datosBase64 = await leerComoBase64(archivo);
+    const previewUrl = archivo.type.startsWith("image/") ? URL.createObjectURL(archivo) : null;
+    archivosPendientes.push({
+      nombre: archivo.name,
+      mime: archivo.type || "application/octet-stream",
+      datosBase64,
+      previewUrl,
+    });
+  }
+  inputArchivo.value = "";
+  renderizarAdjuntosPendientes();
+});
+
+function leerComoBase64(archivo){
+  return new Promise((resolve, reject) => {
+    const lector = new FileReader();
+    lector.onload = () => resolve(lector.result.split(",")[1]);
+    lector.onerror = reject;
+    lector.readAsDataURL(archivo);
+  });
+}
+
+function renderizarAdjuntosPendientes(){
+  adjuntosPendientes.innerHTML = "";
+  archivosPendientes.forEach((a, i) => {
+    const chip = document.createElement("div");
+    chip.className = "chip-adjunto";
+    if (a.previewUrl){
+      const img = document.createElement("img");
+      img.src = a.previewUrl;
+      chip.appendChild(img);
+    } else {
+      chip.innerHTML += "📄";
+    }
+    const span = document.createElement("span");
+    span.textContent = a.nombre;
+    chip.appendChild(span);
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = "✕";
+    btn.onclick = () => { archivosPendientes.splice(i, 1); renderizarAdjuntosPendientes(); };
+    chip.appendChild(btn);
+    adjuntosPendientes.appendChild(chip);
+  });
+}
+
+// ---------- Enviar mensaje ----------
+function enviarMensaje(){
+  const texto = entrada.value.trim();
+  if (!texto && archivosPendientes.length === 0) return;
+  if (ws.readyState !== WebSocket.OPEN) return;
+
+  const adjuntosParaMostrar = archivosPendientes.map(a => ({ mime: a.mime, nombre: a.nombre, previewUrl: a.previewUrl }));
+  agregarMensaje(texto, "usuario", adjuntosParaMostrar);
+
+  ws.send(JSON.stringify({
+    texto,
+    archivos: archivosPendientes.map(a => ({ nombre: a.nombre, mime: a.mime, datos: a.datosBase64 })),
+  }));
+
+  entrada.value = "";
+  ajustarAlturaTextarea();
+  archivosPendientes = [];
+  renderizarAdjuntosPendientes();
+  fijarEstado("pensando");
+  mostrarBurbujaPensando();
+}
+
+formEntrada.addEventListener("submit", (e) => { e.preventDefault(); enviarMensaje(); });
+entrada.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey){ e.preventDefault(); enviarMensaje(); }
+});
+
+function ajustarAlturaTextarea(){
+  entrada.style.height = "auto";
+  entrada.style.height = Math.min(entrada.scrollHeight, 140) + "px";
+}
+entrada.addEventListener("input", ajustarAlturaTextarea);
+
+// ---------- Borrar memoria ----------
+document.getElementById("btnMemoria").onclick = () => {
+  if (ws.readyState !== WebSocket.OPEN) return;
+  ws.send(JSON.stringify({ texto: "olvida todo", archivos: [] }));
+};
+
+// ---------- Voz por el navegador (entrada) ----------
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if (SpeechRecognition){
+  const recon = new SpeechRecognition();
+  recon.lang = "es-CO";
+  recon.continuous = false;
+  recon.interimResults = false;
+  let escuchando = false;
+
+  btnMic.onclick = () => { escuchando ? recon.stop() : recon.start(); };
+  recon.onstart = () => { escuchando = true; btnMic.classList.add("activo"); fijarEstado("escuchando"); aviso.textContent = "Escuchando…"; };
+  recon.onend = () => { escuchando = false; btnMic.classList.remove("activo"); if (body.dataset.estado === "escuchando") fijarEstado("idle"); aviso.textContent = "Eula está lista. Escribe, habla o adjunta un archivo."; };
+  recon.onresult = (evento) => { entrada.value = evento.results[0][0].transcript; enviarMensaje(); };
+  recon.onerror = (e) => { aviso.textContent = `Error de voz: ${e.error}`; };
+} else {
+  btnMic.disabled = true;
+  btnMic.title = "Tu navegador no soporta reconocimiento de voz (usa Chrome)";
+}
+</script>
+</body>
+</html>
