@@ -274,8 +274,3 @@ async def ws_chat(websocket: WebSocket, token: str = Query(...), chat_id: str = 
 
 
 app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"), name="static")
-    except WebSocketDisconnect:
-        pass
-
-
-app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"), name="static")
