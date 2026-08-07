@@ -170,7 +170,7 @@
     display:none; flex-direction:column; align-items:center; justify-content:center; z-index:50;
   }
   #modo-voz.visible{ display:flex; }
-  #orbe-grande-wrap{ width:min(60vw, 320px); height:min(60vw, 320px); position:relative; }
+  #orbe-grande-wrap{ width:min(60vw, 320px); height:min(60vw, 320px); position:relative; cursor:pointer; }
   #estado-voz{
     margin-top:26px; font-family:var(--font-mono); font-size:12.5px; letter-spacing:.08em;
     color:var(--text-dim); text-transform:uppercase;
@@ -248,6 +248,8 @@ let chats = [];
 let vozFemenina = null;
 let reconociendo = false;
 let recognition = null;
+let estadoOrbe = 'reposo'; // 'reposo' | 'escuchando' | 'pensando' | 'hablando'
+let cicloVoz = 0; // se incrementa cada vez que se interrumpe/reinicia un ciclo de voz
 
 const $ = (sel) => document.querySelector(sel);
 const elMensajesInner = $('#mensajes-inner');
@@ -284,6 +286,7 @@ function svgEsfera(id, tam){
 $('#orbe-grande-wrap').innerHTML = svgEsfera('orbe-grande', 320);
 
 function estilizarOrbe(id, estado){
+  if (id === 'orbe-grande') estadoOrbe = estado;
   // estado: 'reposo' | 'escuchando' | 'pensando' | 'hablando'
   const nucleo = document.querySelector(`.nucleo-${id}`);
   const anilloA = document.querySelector(`.anillo-a-${id}`);
@@ -388,41 +391,63 @@ function abrirModoVoz(){
 }
 function cerrarModoVoz(){
   elModoVoz.classList.remove('visible');
+  cicloVoz++; // invalida cualquier flujo de voz en curso
   if (recognition) try{ recognition.stop(); }catch(e){}
   speechSynthesis.cancel();
 }
 $('#btn-mic').addEventListener('click', abrirModoVoz);
 $('#btn-salir-voz').addEventListener('click', cerrarModoVoz);
 
+/* ---------- Click en la esfera: hablar, o interrumpir si está hablando ---------- */
 $('#orbe-grande-wrap').addEventListener('click', () => {
-  if (!SpeechRec || reconociendo) return;
+  if (estadoOrbe === 'hablando'){
+    // Interrumpir a Eula: corta el audio y empieza a escuchar de una vez
+    speechSynthesis.cancel();
+    iniciarEscucha();
+    return;
+  }
+  if (!SpeechRec || reconociendo || estadoOrbe === 'pensando') return;
+  iniciarEscucha();
+});
+
+function iniciarEscucha(){
+  const miCiclo = ++cicloVoz; // invalida cualquier flujo de voz anterior
   reconociendo = true;
   estilizarOrbe('orbe-grande','escuchando');
   elEstadoVoz.textContent = 'Escuchando…';
   elTranscripcionVoz.textContent = '';
 
   recognition.onresult = (e) => {
+    if (miCiclo !== cicloVoz) return;
     let texto = '';
     for (const r of e.results) texto += r[0].transcript;
     elTranscripcionVoz.textContent = texto;
   };
-  recognition.onerror = () => { reconociendo = false; estilizarOrbe('orbe-grande','reposo'); elEstadoVoz.textContent = 'No te escuché bien, toca para volver a intentar.'; };
+  recognition.onerror = () => {
+    if (miCiclo !== cicloVoz) return;
+    reconociendo = false;
+    estilizarOrbe('orbe-grande','reposo');
+    elEstadoVoz.textContent = 'No te escuché bien, toca para volver a intentar.';
+  };
   recognition.onend = async () => {
     reconociendo = false;
+    if (miCiclo !== cicloVoz) return;
     const texto = elTranscripcionVoz.textContent.trim();
     if (!texto){ estilizarOrbe('orbe-grande','reposo'); elEstadoVoz.textContent = 'Toca la esfera para hablar'; return; }
     estilizarOrbe('orbe-grande','pensando');
     elEstadoVoz.textContent = 'Pensando…';
     const respuesta = await enviarMensajeYEsperar(texto);
+    if (miCiclo !== cicloVoz) return;
     estilizarOrbe('orbe-grande','hablando');
-    elEstadoVoz.textContent = 'Hablando…';
+    elEstadoVoz.textContent = 'Hablando… (toca para interrumpir)';
     elTranscripcionVoz.textContent = respuesta || '';
     await hablar(respuesta || '');
+    if (miCiclo !== cicloVoz) return;
     estilizarOrbe('orbe-grande','reposo');
     elEstadoVoz.textContent = 'Toca la esfera para hablar';
   };
   recognition.start();
-});
+}
 
 /* ======================================================
    CHATS: listar / crear / borrar / cambiar
