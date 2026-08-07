@@ -1,0 +1,4 @@
+websockets>=12.0
+
+# Dependencias que ya usaba comandos.py (por si control de Spotify, etc.)
+# comandos.py solo usa librerías estándar de Python, no necesita nada extra.
