@@ -17,7 +17,7 @@ from google import genai
 from google.genai import types
 
 API_KEY = os.environ.get("GEMINI_API_KEY", "")
-MODELO_NUBE = "gemini-2.5-flash"
+MODELO_NUBE = "gemini-flash-latest"
 
 # Tipos de archivo que Gemini puede interpretar de forma nativa.
 # Cualquier otro tipo se manda igual, pero puede que Gemini no lo
