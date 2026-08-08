@@ -29,7 +29,7 @@ API_KEY = os.environ.get("GEMINI_API_KEY", "")
 # de tanto en tanto -> si en el futuro esto vuelve a dar 404, entra a
 # aistudio.google.com y copia el nombre exacto del modelo Flash-Lite
 # que te muestre ahí como disponible.
-MODELO_NUBE = "gemini-3.5-flash-lite"
+MODELO_NUBE = "gemini-flash-lite-latest"
 
 # Tipos de archivo que Gemini puede interpretar de forma nativa.
 # Cualquier otro tipo se manda igual, pero puede que Gemini no lo
