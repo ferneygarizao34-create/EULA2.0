@@ -24,7 +24,12 @@ from google import genai
 from google.genai import types
 
 API_KEY = os.environ.get("GEMINI_API_KEY", "")
-MODELO_NUBE = "gemini-2.5-flash-lite"
+
+# Modelo vigente y gratuito (agosto 2026). Google retira modelos viejos
+# de tanto en tanto -> si en el futuro esto vuelve a dar 404, entra a
+# aistudio.google.com y copia el nombre exacto del modelo Flash-Lite
+# que te muestre ahí como disponible.
+MODELO_NUBE = "gemini-3.5-flash-lite"
 
 # Tipos de archivo que Gemini puede interpretar de forma nativa.
 # Cualquier otro tipo se manda igual, pero puede que Gemini no lo
